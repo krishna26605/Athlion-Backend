@@ -15,14 +15,14 @@ async function createEvent() {
             process.exit(1);
         }
 
-        const count = await Event.countDocuments({ name: 'Hyrox Mumbai 2026' });
+        const count = await Event.countDocuments({ name: 'Athlion Mumbai 2026' });
         if (count > 0) {
             console.log('Event already exists');
             process.exit(0);
         }
 
         const event = await Event.create({
-            name: 'Hyrox Mumbai 2026',
+            name: 'Athlion Mumbai 2026',
             description: 'The Fitness Race for Every Body. Join the global fitness series now in Mumbai!',
             venue: {
                 address: 'Jio World Convention Centre, Bandra Kurla Complex, Mumbai',

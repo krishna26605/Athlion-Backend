@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Environment Variables
+.env
+.env.local
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Utility & Scratch Scripts
+test-*.js
+check-db.js
+create-admin.js
+promote-admin.js
+test-direct.js
+test-api-v2.js
+test-api.js
+test-email.js
+test-465.js
+test-new-email.js
+
+# OS Files
+.DS_Store
+Thumbs.db

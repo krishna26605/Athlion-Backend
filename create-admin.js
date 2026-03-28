@@ -5,7 +5,7 @@ require('dotenv').config();
 const createAdmin = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_URI);
-        const email = 'admin@hyrox.com';
+        const email = 'admin@athlion.com';
         const password = 'Password123!';
 
         // Delete if exists

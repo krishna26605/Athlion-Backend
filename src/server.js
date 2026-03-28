@@ -27,7 +27,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // Basic Route
 app.get('/', (req, res) => {
-    res.json({ message: 'HYROX Backend API is running...' });
+    res.json({ message: 'ATHLiON Backend API is running...' });
 });
 
 // Mount routes

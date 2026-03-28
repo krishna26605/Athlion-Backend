@@ -53,11 +53,24 @@ const registrationSchema = new mongoose.Schema({
     },
     level: {
         type: String,
-        enum: ['advance', 'intermediate'],
+        enum: ['elite', 'classical'],
     },
     category: {
         type: String,
         default: 'Single',
+    },
+    discountType: {
+        type: String,
+        enum: ['super_early', 'early', 'coupon', 'none'],
+        default: 'none',
+    },
+    discountValue: {
+        type: Number,
+        default: 0,
+    },
+    discountLabel: {
+        type: String,
+        default: '',
     },
     verificationCode: {
         type: String,
