@@ -18,7 +18,13 @@ const app = express();
 
 // Middlewares
 app.use(helmet());
-app.use(cors({ origin: "*" }));
+app.use(require("cors")({
+    origin: [
+        "http://localhost:3000",
+        "https://athlion-frontend.vercel.app"
+    ],
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV === 'development') {
