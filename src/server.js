@@ -44,6 +44,15 @@ app.use('/api/admin', admin);
 app.use('/api/sponsors', sponsors);
 app.use('/api/checkin', checkin);
 
+
+// 🔥 ADD THESE (alias routes for frontend compatibility)
+app.use('/auth', auth);
+app.use('/events', events);
+app.use('/registrations', registrations);
+app.use('/admin', admin);
+app.use('/sponsors', sponsors);
+app.use('/checkin', checkin);
+
 // Error Handling Middleware (Base)
 app.use((err, req, res, next) => {
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
