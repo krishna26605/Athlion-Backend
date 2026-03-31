@@ -13,6 +13,7 @@ const registrations = require('./routes/registrations');
 const sponsors = require('./routes/sponsors');
 const checkin = require('./routes/checkin');
 const admin = require('./routes/admin');
+const ai = require('./routes/ai');
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/api/registrations', registrations);
 app.use('/api/admin', admin);
 app.use('/api/sponsors', sponsors);
 app.use('/api/checkin', checkin);
+app.use('/api/ai', ai);
 
 
 // 🔥 ADD THESE (alias routes for frontend compatibility)
@@ -52,6 +54,7 @@ app.use('/registrations', registrations);
 app.use('/admin', admin);
 app.use('/sponsors', sponsors);
 app.use('/checkin', checkin);
+app.use('/ai', ai);
 
 // Error Handling Middleware (Base)
 app.use((err, req, res, next) => {

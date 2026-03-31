@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
@@ -24,6 +25,7 @@
     "morgan": "^1.10.1",
     "nodemailer": "^8.0.4",
     "nodemon": "^3.1.14",
+    "openai": "^6.33.0",
     "qrcode": "^1.5.4",
     "razorpay": "^2.9.6",
     "twilio": "^5.12.2",
