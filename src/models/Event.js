@@ -54,6 +54,10 @@ const eventSchema = new mongoose.Schema({
         required: [true, 'Please add a registration price'],
         default: 0,
     },
+    image: {
+        type: String,
+        default: 'https://images.unsplash.com/photo-1594882645126-14020914d58d?q=80&w=2085&auto=format&fit=crop',
+    },
     createdAt: {
         type: Date,
         default: Date.now,
