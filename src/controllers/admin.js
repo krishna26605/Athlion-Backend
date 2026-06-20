@@ -5,6 +5,9 @@ const Sponsor = require('../models/Sponsor');
 const Coupon = require('../models/Coupon');
 const EarlyBirdConfig = require('../models/EarlyBirdConfig');
 const crypto = require('crypto');
+const eventsCache = require('../utils/eventsCache');
+
+const EVENTS_CACHE_KEY = 'all_events';
 
 // @desc    Get all users
 // @route   GET /api/admin/users
@@ -139,6 +142,8 @@ exports.createOrUpdateEarlyBirdConfig = async (req, res, next) => {
             { upsert: true, new: true, runValidators: true }
         );
 
+        eventsCache.del(EVENTS_CACHE_KEY);
+
         res.status(200).json({ success: true, data: config });
     } catch (err) {
         next(err);
@@ -181,6 +186,7 @@ exports.deleteEarlyBirdConfig = async (req, res, next) => {
         if (!config) {
             return res.status(404).json({ success: false, message: 'No early bird config found for this event' });
         }
+        eventsCache.del(EVENTS_CACHE_KEY);
         res.status(200).json({ success: true, data: {} });
     } catch (err) {
         next(err);

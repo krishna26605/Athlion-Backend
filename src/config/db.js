@@ -60,6 +60,11 @@ async function resolveManualUri(srvUri) {
 }
 
 const connectDB = async () => {
+    // Reuse active connection — critical for serverless warm instances
+    if (mongoose.connection.readyState === 1) {
+        return;
+    }
+
     const MONGODB_URI = process.env.MONGODB_URI;
 
     if (!MONGODB_URI) {
@@ -78,7 +83,9 @@ const connectDB = async () => {
     }
 
     const opts = {
-        family: 4
+        family: 4,
+        bufferCommands: false,        // fail fast instead of buffering on cold start
+        serverSelectionTimeoutMS: 5000,
     };
 
     try {

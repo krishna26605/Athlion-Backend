@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-// Load environment variables immediately
 require('dotenv').config();
 
 const connectDB = require('./config/db');
@@ -17,12 +16,11 @@ const ai = require('./routes/ai');
 
 const app = express();
 
-// Middlewares
 app.use(helmet());
-app.use(require("cors")({
+app.use(cors({
     origin: [
-        "http://localhost:3000",
-        "https://athlion-frontend.vercel.app"
+        'http://localhost:3000',
+        'https://athlion-frontend.vercel.app'
     ],
     credentials: true
 }));
@@ -32,12 +30,21 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
-// Basic Route
+// Establish (or reuse) the DB connection on every request.
+// Critical for serverless: cold starts connect, warm instances skip.
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        next(err);
+    }
+});
+
 app.get('/', (req, res) => {
     res.json({ message: 'ATHLiON Backend API is running...' });
 });
 
-// Mount routes
 app.use('/api/auth', auth);
 app.use('/api/events', events);
 app.use('/api/registrations', registrations);
@@ -46,8 +53,7 @@ app.use('/api/sponsors', sponsors);
 app.use('/api/checkin', checkin);
 app.use('/api/ai', ai);
 
-
-// 🔥 ADD THESE (alias routes for frontend compatibility)
+// Alias routes for frontend compatibility
 app.use('/auth', auth);
 app.use('/events', events);
 app.use('/registrations', registrations);
@@ -56,24 +62,12 @@ app.use('/sponsors', sponsors);
 app.use('/checkin', checkin);
 app.use('/ai', ai);
 
-// Error Handling Middleware (Base)
 app.use((err, req, res, next) => {
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-    res.status(statusCode);
-    res.json({
+    res.status(statusCode).json({
         message: err.message,
         stack: process.env.NODE_ENV === 'production' ? null : err.stack,
     });
 });
 
-const startServer = async () => {
-    // Connect to database
-    await connectDB();
-
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-        console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-    });
-};
-
-startServer();
+module.exports = app;

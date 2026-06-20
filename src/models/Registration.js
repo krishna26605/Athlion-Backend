@@ -88,4 +88,7 @@ const registrationSchema = new mongoose.Schema({
 // Compound unique index to prevent duplicate user registration for same event
 registrationSchema.index({ user: 1, event: 1 }, { unique: true });
 
+// Index for fast $lookup joins on the event field
+registrationSchema.index({ event: 1 });
+
 module.exports = mongoose.model('Registration', registrationSchema);

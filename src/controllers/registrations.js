@@ -5,6 +5,9 @@ const EarlyBirdConfig = require('../models/EarlyBirdConfig');
 const razorpay = require('../config/razorpay');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const eventsCache = require('../utils/eventsCache');
+
+const EVENTS_CACHE_KEY = 'all_events';
 
 /**
  * Helper: Calculate discount for a user based on early bird config and coupon status
@@ -263,6 +266,9 @@ const finalizeRegistration = async (req, res, registration, event, paymentId, se
 
     await session.commitTransaction();
     session.endSession();
+
+    // Invalidate events cache — participant count and early-bird tier may have changed
+    eventsCache.del(EVENTS_CACHE_KEY);
 
     // Send WhatsApp Notification (Syncing for better testing error catch)
     const user = await req.user;
