@@ -217,7 +217,8 @@ exports.bookEvent = async (req, res, next) => {
     } catch (err) {
         await session.abortTransaction();
         session.endSession();
-        res.status(400).json({ message: err.message });
+        const errorMessage = err.error?.description || err.message || 'An error occurred with the payment gateway';
+        res.status(400).json({ message: errorMessage });
     }
 };
 
@@ -351,7 +352,8 @@ exports.verifyPayment = async (req, res, next) => {
     } catch (err) {
         if (session.inTransaction()) await session.abortTransaction();
         session.endSession();
-        res.status(400).json({ message: err.message });
+        const errorMessage = err.error?.description || err.message || 'An error occurred with the payment gateway';
+        res.status(400).json({ message: errorMessage });
     }
 };
 
