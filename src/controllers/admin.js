@@ -4,6 +4,10 @@ const Registration = require('../models/Registration');
 const Sponsor = require('../models/Sponsor');
 const Coupon = require('../models/Coupon');
 const EarlyBirdConfig = require('../models/EarlyBirdConfig');
+const EarlyAccessLead = require('../models/EarlyAccessLead');
+const AnalyticsVisit = require('../models/AnalyticsVisit');
+const { sendEarlyAccessNotification } = require('../services/email');
+const { sendWhatsAppMessage, sendSMSMessage } = require('../services/whatsapp');
 const crypto = require('crypto');
 const eventsCache = require('../utils/eventsCache');
 
@@ -192,3 +196,212 @@ exports.deleteEarlyBirdConfig = async (req, res, next) => {
         next(err);
     }
 };
+
+// @desc    Get all Early Access leads with filtering & pagination
+// @route   GET /api/admin/early-access/leads
+// @access  Private/Admin
+exports.getEarlyAccessLeads = async (req, res, next) => {
+    try {
+        const { search, source, gym, page = 1, limit = 50 } = req.query;
+
+        const query = {};
+
+        if (search) {
+            query.$or = [
+                { fullName: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } },
+                { phone: { $regex: search, $options: 'i' } },
+            ];
+        }
+
+        if (source) {
+            query.leadSource = source;
+        }
+
+        if (gym) {
+            query.$or = [
+                { gymReferralCode: { $regex: gym, $options: 'i' } },
+                { gymName: { $regex: gym, $options: 'i' } },
+            ];
+        }
+
+        const skip = (page - 1) * limit;
+        const leads = await EarlyAccessLead.find(query)
+            .populate('convertedEventId', 'name date price')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        const total = await EarlyAccessLead.countDocuments(query);
+
+        res.status(200).json({
+            success: true,
+            count: leads.length,
+            total,
+            page: parseInt(page),
+            pages: Math.ceil(total / limit),
+            data: leads,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// @desc    Get Early Access and Traffic Analytics Overview
+// @route   GET /api/admin/early-access/analytics
+// @access  Private/Admin
+exports.getEarlyAccessAnalytics = async (req, res, next) => {
+    try {
+        const totalVisits = await AnalyticsVisit.countDocuments();
+        const totalLeads = await EarlyAccessLead.countDocuments();
+        const convertedLeadsToTicket = await EarlyAccessLead.countDocuments({ convertedToTicket: true });
+
+        // Conversion rates
+        const visitToLeadRate = totalVisits > 0 ? ((totalLeads / totalVisits) * 100).toFixed(2) : 0;
+        const leadToTicketRate = totalLeads > 0 ? ((convertedLeadsToTicket / totalLeads) * 100).toFixed(2) : 0;
+
+        // Revenue from early access leads
+        const revenueResult = await EarlyAccessLead.aggregate([
+            { $match: { convertedToTicket: true } },
+            { $group: { _id: null, totalRevenue: { $sum: '$ticketAmountPaid' } } }
+        ]);
+
+        const totalEarlyAccessRevenue = revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0;
+
+        // Source breakdown
+        const sourceBreakdown = await EarlyAccessLead.aggregate([
+            { $group: { _id: '$leadSource', count: { $sum: 1 } } }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                totalVisits,
+                totalLeads,
+                convertedLeadsToTicket,
+                visitToLeadRate: parseFloat(visitToLeadRate),
+                leadToTicketRate: parseFloat(leadToTicketRate),
+                totalEarlyAccessRevenue,
+                sourceBreakdown,
+            }
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// @desc    Get Gym Partner Referral Analytics & 50-member royalty progress
+// @route   GET /api/admin/early-access/gym-analytics
+// @access  Private/Admin
+exports.getGymAnalytics = async (req, res, next) => {
+    try {
+        const gymStats = await EarlyAccessLead.aggregate([
+            { $match: { gymReferralCode: { $ne: '' } } },
+            {
+                $group: {
+                    _id: { code: '$gymReferralCode', name: '$gymName' },
+                    totalLeads: { $sum: 1 },
+                    ticketBuyers: {
+                        $sum: { $cond: [{ $eq: ['$convertedToTicket', true] }, 1, 0] }
+                    },
+                    totalRevenue: { $sum: '$ticketAmountPaid' }
+                }
+            },
+            { $sort: { totalLeads: -1 } }
+        ]);
+
+        const formatted = gymStats.map(item => {
+            const registeredCount = item.totalLeads;
+            const thresholdReached = registeredCount >= 50;
+            return {
+                gymCode: item._id.code,
+                gymName: item._id.name || item._id.code,
+                totalLeads: registeredCount,
+                ticketBuyers: item.ticketBuyers,
+                totalRevenue: item.totalRevenue,
+                thresholdReached,
+                progressPercentage: Math.min(100, Math.round((registeredCount / 50) * 100)),
+                royaltyEligible: thresholdReached,
+            };
+        });
+
+        res.status(200).json({
+            success: true,
+            count: formatted.length,
+            data: formatted,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// @desc    Send Multi-Channel Notification to Early Access Leads for launched event
+// @route   POST /api/admin/early-access/notify
+// @access  Private/Admin
+exports.notifyEarlyAccessLeads = async (req, res, next) => {
+    try {
+        const { eventId, customMessage, channels } = req.body;
+
+        if (!eventId) {
+            return res.status(400).json({ success: false, message: 'Please provide eventId' });
+        }
+
+        const event = await Event.findById(eventId);
+        if (!event) {
+            return res.status(404).json({ success: false, message: 'Event not found' });
+        }
+
+        const activeChannels = Array.isArray(channels) && channels.length > 0
+            ? channels
+            : ['email'];
+
+        const leads = await EarlyAccessLead.find({ notified: false });
+
+        let emailSent = 0;
+        let smsSent = 0;
+        let whatsappSent = 0;
+
+        for (const lead of leads) {
+            const usedChannels = [];
+
+            if (activeChannels.includes('email') && lead.email) {
+                await sendEarlyAccessNotification(lead, event, customMessage);
+                usedChannels.push('email');
+                emailSent++;
+            }
+
+            if (activeChannels.includes('sms') && lead.phone) {
+                const smsBody = `🔥 ATHLiON ALERT: ${event.name} is LIVE! Register now at https://athlion-frontend.vercel.app/events/${event._id}`;
+                await sendSMSMessage(lead.phone, smsBody);
+                usedChannels.push('sms');
+                smsSent++;
+            }
+
+            if (activeChannels.includes('whatsapp') && lead.phone) {
+                const waBody = `🏆 *ATHLiON EARLY ACCESS ALERT*\n\nHey *${lead.fullName}*!\nThe wait is over. *${event.name}* is officially OPEN for registration.\n\n📅 Date: ${new Date(event.date).toLocaleDateString()}\n📍 Address: ${event.venue?.address || 'TBA'}\n\n👉 Register now: https://athlion-frontend.vercel.app/events/${event._id}`;
+                await sendWhatsAppMessage(lead.phone, waBody);
+                usedChannels.push('whatsapp');
+                whatsappSent++;
+            }
+
+            lead.notified = true;
+            lead.notifiedChannels = usedChannels;
+            lead.notifiedAt = new Date();
+            await lead.save();
+        }
+
+        res.status(200).json({
+            success: true,
+            totalNotified: leads.length,
+            breakdown: {
+                emailSent,
+                smsSent,
+                whatsappSent,
+            },
+            message: `Successfully notified ${leads.length} early access leads across chosen channels!`,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+

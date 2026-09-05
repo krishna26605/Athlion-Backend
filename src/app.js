@@ -13,6 +13,8 @@ const sponsors = require('./routes/sponsors');
 const checkin = require('./routes/checkin');
 const admin = require('./routes/admin');
 const ai = require('./routes/ai');
+const analytics = require('./routes/analytics');
+const earlyAccess = require('./routes/earlyAccess');
 
 const app = express();
 
@@ -52,6 +54,8 @@ app.use('/api/admin', admin);
 app.use('/api/sponsors', sponsors);
 app.use('/api/checkin', checkin);
 app.use('/api/ai', ai);
+app.use('/api/analytics', analytics);
+app.use('/api/early-access', earlyAccess);
 
 // Alias routes for frontend compatibility
 app.use('/auth', auth);
@@ -61,6 +65,8 @@ app.use('/admin', admin);
 app.use('/sponsors', sponsors);
 app.use('/checkin', checkin);
 app.use('/ai', ai);
+app.use('/analytics', analytics);
+app.use('/early-access', earlyAccess);
 
 app.use((err, req, res, next) => {
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode;

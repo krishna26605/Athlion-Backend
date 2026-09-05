@@ -204,4 +204,72 @@ const sendRegistrationConfirmation = async (user, event, registration) => {
     }
 };
 
-module.exports = { sendRegistrationConfirmation };
+/**
+ * Send Early Access Notification Email when a new event launches
+ */
+const sendEarlyAccessNotification = async (lead, event, customMessage) => {
+    const eventDate = new Date(event.date).toLocaleDateString('en-IN', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    const defaultMsg = `The wait is over! Athlion's flagship event <strong>${event.name}</strong> is officially open for registration. As an Early Access member, secure your spot now!`;
+    const messageBody = customMessage || defaultMsg;
+
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"></head>
+    <body style="margin: 0; padding: 0; background-color: #000000; font-family: 'Helvetica Neue', Arial, sans-serif; color: #ffffff;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #0a0a0a;">
+            <div style="background: linear-gradient(135deg, #f82506 0%, #c91d04 100%); padding: 40px 30px; text-align: center;">
+                <h1 style="margin: 0; font-size: 36px; font-weight: 900; font-style: italic; letter-spacing: -2px; color: #ffffff;">ATHLiON</h1>
+                <p style="margin: 8px 0 0; font-size: 11px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.9);">
+                    🔥 Early Access Launch Alert
+                </p>
+            </div>
+            <div style="padding: 40px 30px;">
+                <h2 style="margin: 0 0 12px; font-size: 24px; font-weight: 900; color: #ffffff;">Hey ${lead.fullName}! 🚀</h2>
+                <p style="font-size: 15px; color: #d1d5db; line-height: 1.6;">${messageBody}</p>
+
+                <div style="background: #18181b; border: 1px solid #f82506; border-radius: 16px; padding: 24px; margin: 24px 0;">
+                    <h3 style="margin: 0 0 12px; font-size: 18px; color: #f82506; font-style: italic;">${event.name}</h3>
+                    <p style="margin: 4px 0; color: #9ca3af; font-size: 14px;">📅 Date: <strong style="color: #fff;">${eventDate}</strong></p>
+                    <p style="margin: 4px 0; color: #9ca3af; font-size: 14px;">📍 Venue: <strong style="color: #fff;">${event.venue?.address || 'TBA'}</strong></p>
+                    <p style="margin: 4px 0; color: #9ca3af; font-size: 14px;">🎟️ Ticket Price: <strong style="color: #f82506;">₹${event.price}</strong></p>
+                </div>
+
+                <div style="text-align: center; margin: 32px 0;">
+                    <a href="https://athlion-frontend.vercel.app/events/${event._id || ''}" style="background: #f82506; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: inline-block;">
+                        Get Your Tickets Now
+                    </a>
+                </div>
+            </div>
+            <div style="padding: 24px; border-top: 1px solid #1a1a1a; text-align: center; font-size: 11px; color: #4b5563;">
+                <p style="margin: 0;">ATHLiON — The World's Largest Fitness Race</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
+
+    const mailOptions = {
+        from: `"${process.env.FROM_NAME || 'ATHLiON'}" <${process.env.SMTP_USER || process.env.FROM_EMAIL}>`,
+        to: lead.email,
+        subject: `🔥 EARLY ACCESS ALERT: ${event.name} Registration is LIVE! | ATHLiON`,
+        html,
+    };
+
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`📧 Early Access email sent to ${lead.email}`);
+        return info;
+    } catch (error) {
+        console.error(`📧 Early Access Email Error for ${lead.email}: ${error.message}`);
+    }
+};
+
+module.exports = { sendRegistrationConfirmation, sendEarlyAccessNotification };
+

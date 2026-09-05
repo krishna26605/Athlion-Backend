@@ -2,6 +2,7 @@ const Event = require('../models/Event');
 const Registration = require('../models/Registration');
 const Coupon = require('../models/Coupon');
 const EarlyBirdConfig = require('../models/EarlyBirdConfig');
+const EarlyAccessLead = require('../models/EarlyAccessLead');
 const razorpay = require('../config/razorpay');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
@@ -264,6 +265,27 @@ const finalizeRegistration = async (req, res, registration, event, paymentId, se
     // Update Event current participants
     event.currentParticipants += 1;
     await event.save({ session });
+
+    // Attribute Early Access conversion & revenue if user registered beforehand
+    const User = require('../models/User');
+    const userDoc = await User.findById(registration.user).session(session);
+    if (userDoc) {
+        await EarlyAccessLead.updateMany(
+            {
+                $or: [
+                    { email: userDoc.email ? userDoc.email.toLowerCase() : '' },
+                    { phone: userDoc.phone || '' }
+                ]
+            },
+            {
+                $set: {
+                    convertedToTicket: true,
+                    convertedEventId: event._id,
+                    ticketAmountPaid: registration.amountPaid || event.price || 0,
+                }
+            }
+        ).session(session);
+    }
 
     await session.commitTransaction();
     session.endSession();

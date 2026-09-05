@@ -7,7 +7,11 @@ const {
     createOrUpdateEarlyBirdConfig,
     getAllEarlyBirdConfigs,
     getEarlyBirdConfig,
-    deleteEarlyBirdConfig
+    deleteEarlyBirdConfig,
+    getEarlyAccessLeads,
+    getEarlyAccessAnalytics,
+    getGymAnalytics,
+    notifyEarlyAccessLeads,
 } = require('../controllers/admin');
 
 const { protect, authorize } = require('../middleware/auth');
@@ -29,4 +33,11 @@ router.get('/early-bird', getAllEarlyBirdConfigs);
 router.get('/early-bird/:eventId', getEarlyBirdConfig);
 router.delete('/early-bird/:eventId', deleteEarlyBirdConfig);
 
+// Early Access Lead & Gym Analytics routes
+router.get('/early-access/leads', getEarlyAccessLeads);
+router.get('/early-access/analytics', getEarlyAccessAnalytics);
+router.get('/early-access/gym-analytics', getGymAnalytics);
+router.post('/early-access/notify', notifyEarlyAccessLeads);
+
 module.exports = router;
+
