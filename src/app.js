@@ -23,9 +23,9 @@ app.use(cors({
     origin: [
         'http://localhost:3000',
         'https://athlion-frontend.vercel.app',
-        'https://athlion-backend-00ta.onrender.com/',
-        'https://athlion.in/',
-        'https://www.athlion.in/'
+        'https://athlion-backend-00ta.onrender.com',
+        'https://athlion.in',
+        'https://www.athlion.in'
     ],
     credentials: true
 }));
