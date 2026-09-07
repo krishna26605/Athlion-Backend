@@ -1,3 +1,9 @@
+# Build Outputs
+.next/
+.vercel/
+out/
+build/
+
 # Dependencies
 node_modules/
 
