@@ -1,7 +1,0 @@
-{
-  "/api/ai/chat/route": "app/api/ai/chat/route.js",
-  "/api/analytics/track-visit/route": "app/api/analytics/track-visit/route.js",
-  "/api/blogs/route": "app/api/blogs/route.js",
-  "/api/early-access/gyms/route": "app/api/early-access/gyms/route.js",
-  "/api/sponsors/route": "app/api/sponsors/route.js"
-}
