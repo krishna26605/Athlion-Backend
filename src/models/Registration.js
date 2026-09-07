@@ -28,7 +28,6 @@ const registrationSchema = new mongoose.Schema({
     },
     qrCode: {
         type: String,
-        unique: true,
     },
     orderId: {
         type: String,
@@ -90,5 +89,11 @@ registrationSchema.index({ user: 1, event: 1 }, { unique: true });
 
 // Index for fast $lookup joins on the event field
 registrationSchema.index({ event: 1 });
+
+// Partial filter index for qrCode unique string constraint
+registrationSchema.index(
+    { qrCode: 1 },
+    { unique: true, partialFilterExpression: { qrCode: { $type: 'string' } } }
+);
 
 module.exports = mongoose.model('Registration', registrationSchema);
