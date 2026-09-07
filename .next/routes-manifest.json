@@ -1,0 +1,362 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/:path*",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,DELETE,PATCH,POST,PUT,OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+        }
+      ],
+      "regex": "^/api(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+    }
+  ],
+  "onMatchHeaders": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [
+      {
+        "source": "/auth/:path*",
+        "destination": "/api/auth/:path*",
+        "regex": "^/auth(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/events/:path*",
+        "destination": "/api/events/:path*",
+        "regex": "^/events(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/registrations/:path*",
+        "destination": "/api/registrations/:path*",
+        "regex": "^/registrations(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/admin/:path*",
+        "destination": "/api/admin/:path*",
+        "regex": "^/admin(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/sponsors/:path*",
+        "destination": "/api/sponsors/:path*",
+        "regex": "^/sponsors(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/checkin/:path*",
+        "destination": "/api/checkin/:path*",
+        "regex": "^/checkin(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/ai/:path*",
+        "destination": "/api/ai/:path*",
+        "regex": "^/ai(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/analytics/:path*",
+        "destination": "/api/analytics/:path*",
+        "regex": "^/analytics(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/early-access/:path*",
+        "destination": "/api/early-access/:path*",
+        "regex": "^/early-access(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/blogs/:path*",
+        "destination": "/api/blogs/:path*",
+        "regex": "^/blogs(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      }
+    ],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/api/admin/early-bird/[eventId]",
+      "regex": "^/api/admin/early\\-bird/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPeventId": "nxtPeventId"
+      },
+      "namedRegex": "^/api/admin/early\\-bird/(?<nxtPeventId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/blogs/id/[id]",
+      "regex": "^/api/blogs/id/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/blogs/id/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/blogs/[slug]",
+      "regex": "^/api/blogs/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/api/blogs/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/checkin/event/[eventId]",
+      "regex": "^/api/checkin/event/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPeventId": "nxtPeventId"
+      },
+      "namedRegex": "^/api/checkin/event/(?<nxtPeventId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/events/[id]",
+      "regex": "^/api/events/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/events/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/registrations/admin/verify/[id]",
+      "regex": "^/api/registrations/admin/verify/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/registrations/admin/verify/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/registrations/book/[eventId]",
+      "regex": "^/api/registrations/book/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPeventId": "nxtPeventId"
+      },
+      "namedRegex": "^/api/registrations/book/(?<nxtPeventId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/registrations/check-discount/[eventId]",
+      "regex": "^/api/registrations/check\\-discount/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPeventId": "nxtPeventId"
+      },
+      "namedRegex": "^/api/registrations/check\\-discount/(?<nxtPeventId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/registrations/test-register/[eventId]",
+      "regex": "^/api/registrations/test\\-register/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPeventId": "nxtPeventId"
+      },
+      "namedRegex": "^/api/registrations/test\\-register/(?<nxtPeventId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/sponsors/[id]",
+      "regex": "^/api/sponsors/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/sponsors/(?<nxtPid>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/api/admin/coupons",
+      "regex": "^/api/admin/coupons(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/coupons(?:/)?$"
+    },
+    {
+      "page": "/api/admin/coupons/bulk-generate",
+      "regex": "^/api/admin/coupons/bulk\\-generate(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/coupons/bulk\\-generate(?:/)?$"
+    },
+    {
+      "page": "/api/admin/early-access/analytics",
+      "regex": "^/api/admin/early\\-access/analytics(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/early\\-access/analytics(?:/)?$"
+    },
+    {
+      "page": "/api/admin/early-access/gym-analytics",
+      "regex": "^/api/admin/early\\-access/gym\\-analytics(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/early\\-access/gym\\-analytics(?:/)?$"
+    },
+    {
+      "page": "/api/admin/early-access/leads",
+      "regex": "^/api/admin/early\\-access/leads(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/early\\-access/leads(?:/)?$"
+    },
+    {
+      "page": "/api/admin/early-access/notify",
+      "regex": "^/api/admin/early\\-access/notify(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/early\\-access/notify(?:/)?$"
+    },
+    {
+      "page": "/api/admin/early-bird",
+      "regex": "^/api/admin/early\\-bird(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/early\\-bird(?:/)?$"
+    },
+    {
+      "page": "/api/admin/stats",
+      "regex": "^/api/admin/stats(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/stats(?:/)?$"
+    },
+    {
+      "page": "/api/admin/users",
+      "regex": "^/api/admin/users(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/users(?:/)?$"
+    },
+    {
+      "page": "/api/ai/chat",
+      "regex": "^/api/ai/chat(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/ai/chat(?:/)?$"
+    },
+    {
+      "page": "/api/analytics/track-visit",
+      "regex": "^/api/analytics/track\\-visit(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/analytics/track\\-visit(?:/)?$"
+    },
+    {
+      "page": "/api/auth/login",
+      "regex": "^/api/auth/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/login(?:/)?$"
+    },
+    {
+      "page": "/api/auth/me",
+      "regex": "^/api/auth/me(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/me(?:/)?$"
+    },
+    {
+      "page": "/api/auth/register",
+      "regex": "^/api/auth/register(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/register(?:/)?$"
+    },
+    {
+      "page": "/api/blogs",
+      "regex": "^/api/blogs(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/blogs(?:/)?$"
+    },
+    {
+      "page": "/api/checkin",
+      "regex": "^/api/checkin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/checkin(?:/)?$"
+    },
+    {
+      "page": "/api/early-access/gyms",
+      "regex": "^/api/early\\-access/gyms(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/early\\-access/gyms(?:/)?$"
+    },
+    {
+      "page": "/api/early-access/register",
+      "regex": "^/api/early\\-access/register(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/early\\-access/register(?:/)?$"
+    },
+    {
+      "page": "/api/events",
+      "regex": "^/api/events(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/events(?:/)?$"
+    },
+    {
+      "page": "/api/registrations/admin/all",
+      "regex": "^/api/registrations/admin/all(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/registrations/admin/all(?:/)?$"
+    },
+    {
+      "page": "/api/registrations/my",
+      "regex": "^/api/registrations/my(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/registrations/my(?:/)?$"
+    },
+    {
+      "page": "/api/registrations/verify",
+      "regex": "^/api/registrations/verify(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/registrations/verify(?:/)?$"
+    },
+    {
+      "page": "/api/sponsors",
+      "regex": "^/api/sponsors(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/sponsors(?:/)?$"
+    },
+    {
+      "page": "/api/sponsors/coupons",
+      "regex": "^/api/sponsors/coupons(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/sponsors/coupons(?:/)?$"
+    },
+    {
+      "page": "/api/sponsors/coupons/validate",
+      "regex": "^/api/sponsors/coupons/validate(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/sponsors/coupons/validate(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}
