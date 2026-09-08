@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  serverExternalPackages: ['jsonwebtoken', 'semver', 'mongoose', 'bcryptjs', 'razorpay', 'twilio', 'mongodb',],
+  serverExternalPackages: ['jsonwebtoken', 'semver', 'mongoose', 'bcryptjs', 'razorpay', 'twilio', 'mongodb'],
   async rewrites() {
     return [
       { source: '/auth/:path*', destination: '/api/auth/:path*' },
