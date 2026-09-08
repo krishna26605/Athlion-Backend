@@ -2,6 +2,19 @@
 const nextConfig = {
   reactStrictMode: true,
   serverExternalPackages: ['jsonwebtoken', 'semver', 'mongoose', 'bcryptjs', 'razorpay', 'twilio', 'mongodb'],
+  outputFileTracingIncludes: {
+    '/api/**': ['./node_modules/mongodb/**/*', './node_modules/mongoose/**/*'],
+  },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push({
+        mongodb: 'commonjs mongodb',
+        mongoose: 'commonjs mongoose',
+      });
+    }
+    return config;
+  },
   async rewrites() {
     return [
       { source: '/auth/:path*', destination: '/api/auth/:path*' },
