@@ -15,15 +15,12 @@ router.route('/')
     .get(getBlogs)
     .post(optionalProtect, createBlog);
 
-router.route('/:slug')
-    .get(getBlogBySlug);
-
 router.route('/id/:id')
     .put(optionalProtect, updateBlog)
     .delete(optionalProtect, deleteBlog);
 
-// Direct :id fallbacks for PUT and DELETE
 router.route('/:id')
+    .get(getBlogBySlug)
     .put(optionalProtect, updateBlog)
     .delete(optionalProtect, deleteBlog);
 

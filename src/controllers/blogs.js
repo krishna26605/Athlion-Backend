@@ -136,7 +136,14 @@ exports.createBlog = async (req, res, next) => {
 // @access  Private (Admin)
 exports.updateBlog = async (req, res, next) => {
     try {
-        let blog = await Blog.findById(req.params.id);
+        const targetId = req.params.id || req.params.slug;
+        let blog;
+        if (targetId && targetId.match(/^[0-9a-fA-F]{24}$/)) {
+            blog = await Blog.findById(targetId);
+        }
+        if (!blog && targetId) {
+            blog = await Blog.findOne({ slug: targetId.toLowerCase() });
+        }
 
         if (!blog) {
             return res.status(404).json({ success: false, message: 'Blog post not found' });
@@ -154,7 +161,7 @@ exports.updateBlog = async (req, res, next) => {
 
         req.body.updatedAt = Date.now();
 
-        blog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
+        blog = await Blog.findByIdAndUpdate(blog._id, req.body, {
             new: true,
             runValidators: true,
         });
@@ -170,13 +177,20 @@ exports.updateBlog = async (req, res, next) => {
 // @access  Private (Admin)
 exports.deleteBlog = async (req, res, next) => {
     try {
-        const blog = await Blog.findById(req.params.id);
+        const targetId = req.params.id || req.params.slug;
+        let blog;
+        if (targetId && targetId.match(/^[0-9a-fA-F]{24}$/)) {
+            blog = await Blog.findById(targetId);
+        }
+        if (!blog && targetId) {
+            blog = await Blog.findOne({ slug: targetId.toLowerCase() });
+        }
 
         if (!blog) {
             return res.status(404).json({ success: false, message: 'Blog post not found' });
         }
 
-        await Blog.findByIdAndDelete(req.params.id);
+        await Blog.findByIdAndDelete(blog._id);
 
         res.status(200).json({ success: true, data: {} });
     } catch (err) {
